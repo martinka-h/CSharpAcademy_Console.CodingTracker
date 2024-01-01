@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using System.Globalization;
+using Microsoft.Data.Sqlite;
 
 class Program
 {
@@ -69,24 +70,50 @@ Choose one of the following options:
         }
     }
 
+    private static void InsertRecord()
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            Console.WriteLine("Gimme the dates");
+            string startDateTime = GetDateTimeInput("Provide the session start time and date");
+            string endDateTime = GetDateTimeInput("Provide the session end time and date");
+
+            connection.Open();
+            var tableCmd = connection.CreateCommand();
+            tableCmd.CommandText =
+                $"INSERT INTO coding_sessions (StartDateTime, EndDateTime) VALUES ('{startDateTime}', '{endDateTime}') ";
+            tableCmd.ExecuteNonQuery();
+            connection.Close();
+
+        }
+    }
     private static void UpdateRecord()
     {
         throw new NotImplementedException();
     }
-
     private static void DeleteRecord()
     {
         throw new NotImplementedException();
     }
-
-    private static void InsertRecord()
+    private static void ViewAllRecords()
     {
         throw new NotImplementedException();
     }
 
-    private static void ViewAllRecords()
+    private static string GetDateTimeInput(string message)
     {
-        throw new NotImplementedException();
+        string dateInput = "";
+        var cultureInfo = new CultureInfo("en-US");
+
+        do
+        {
+            Console.WriteLine(message);
+            Console.WriteLine("(Format: yyyy-MM-dd HH:mm)");
+            dateInput = Console.ReadLine();
+
+        } while (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", new CultureInfo("en-US"), DateTimeStyles.None, out _));
+        
+        return dateInput;
     }
 
 
