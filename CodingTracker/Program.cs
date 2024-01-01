@@ -21,6 +21,73 @@ class Program
             tableCmd.ExecuteNonQuery();
             connection.Close();
         }
+
+        MainMenu();
     }
+
+    static void MainMenu()
+    {
+        Console.Clear();
+        bool closeApp = false;
+        while (!closeApp)
+        {
+
+            Console.WriteLine(@"CODING TRACKER
+____________________________
+MAIN MENU
+
+Choose one of the following options:
+0 - Exit the application
+1 - View all records
+2 - Insert record
+3 - Delete record
+4 - Update record");
+
+            switch (Console.ReadLine())
+            {
+                case "0":
+                    closeApp = true;
+                    Environment.Exit(0);
+                    break;
+                case "1":
+                    ViewAllRecords();
+                    break;
+                case "2":
+                    InsertRecord();
+                    break;
+                case "3":
+                    DeleteRecord();
+                    break;
+                case "4":
+                    UpdateRecord();
+                    break;
+                default:
+                    Console.WriteLine("Insert a valid commant");
+                    MainMenu();
+                    break;
+            }
+        }
+    }
+
+    private static void UpdateRecord()
+    {
+        throw new NotImplementedException();
+    }
+
+    private static void DeleteRecord()
+    {
+        throw new NotImplementedException();
+    }
+
+    private static void InsertRecord()
+    {
+        throw new NotImplementedException();
+    }
+
+    private static void ViewAllRecords()
+    {
+        throw new NotImplementedException();
+    }
+
 
 }
