@@ -3,13 +3,13 @@
 ## Requirements
 
 - [ ] The application should register coding sessions
-- [ ] Create a sqlite database along with a table on application start, if one isn't present.
-- [ ] The application should show the user a menu of options.
+- [x] Create a sqlite database along with a table on application start, if one isn't present.
+- [x] The application should show the user a menu of options.
 - [ ] Insert, delete, update and view the logged habit functionality.
 - [ ] Error handling so that the application never crashes.
 - [ ] The application should only be terminated when the user inserts "0".
 - [ ] Only interact with the database using raw SQL.
-- [ ] The project needs to contain a README file.
+- [x] The project needs to contain a README file.
 - [ ] The application should store and retrieve data from a real database
 - [ ] Use the "ConsoleTableExt" library to show the data on the console.
 - [ ] Have separate classes in different files 
