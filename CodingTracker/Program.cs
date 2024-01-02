@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Microsoft.Data.Sqlite;
+using CodingTracker;
 
 class Program
 {
@@ -75,8 +76,8 @@ Choose one of the following options:
         using (var connection = new SqliteConnection(connectionString))
         {
             Console.WriteLine("Gimme the dates");
-            string startDateTime = GetDateTimeInput("Provide the session start time and date");
-            string endDateTime = GetDateTimeInput("Provide the session end time and date");
+            string startDateTime = Helpers.GetDateTimeInput("Provide the session start time and date");
+            string endDateTime = Helpers.GetDateTimeInput("Provide the session end time and date");
 
             connection.Open();
             var tableCmd = connection.CreateCommand();
@@ -99,22 +100,4 @@ Choose one of the following options:
     {
         throw new NotImplementedException();
     }
-
-    private static string GetDateTimeInput(string message)
-    {
-        string dateInput = "";
-        var cultureInfo = new CultureInfo("en-US");
-
-        do
-        {
-            Console.WriteLine(message);
-            Console.WriteLine("(Format: yyyy-MM-dd HH:mm)");
-            dateInput = Console.ReadLine();
-
-        } while (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", new CultureInfo("en-US"), DateTimeStyles.None, out _));
-        
-        return dateInput;
-    }
-
-
 }
