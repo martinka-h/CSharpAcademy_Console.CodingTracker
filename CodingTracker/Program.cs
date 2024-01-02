@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Microsoft.Data.Sqlite;
 using CodingTracker;
+using ConsoleTableExt;
 
 class Program
 {
@@ -34,7 +35,9 @@ class Program
         while (!closeApp)
         {
 
-            Console.WriteLine(@"CODING TRACKER
+            Console.WriteLine(@"
+
+CODING TRACKER
 ____________________________
 MAIN MENU
 
@@ -98,6 +101,35 @@ Choose one of the following options:
     }
     private static void ViewAllRecords()
     {
-        throw new NotImplementedException();
+        Console.Clear();
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var tableCmd = connection.CreateCommand();
+            tableCmd.CommandText =
+                $"SELECT * FROM coding_sessions ";
+
+            List<CodingSession> tableData = new();
+            SqliteDataReader reader = tableCmd.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    tableData.Add(new CodingSession
+                    {
+                        Id = reader.GetInt32(0),
+                        StartDateTime = reader.GetString(1),
+                        EndDateTime = reader.GetString(2),
+                    });
+                }
+            } else Console.WriteLine("No rows found");
+
+            connection.Close();
+
+            ConsoleTableBuilder
+                .From(tableData)
+                .ExportAndWrite();
+        }
     }
 }
