@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 
 namespace CodingTracker
 {
@@ -23,6 +18,11 @@ namespace CodingTracker
             } while (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", new CultureInfo("en-US"), DateTimeStyles.None, out _));
 
             return dateInput;
+        }
+
+        public static string CalculateDuration(string endDateTime, string startDateTime)
+        {
+            return DateTime.Parse(endDateTime).Subtract(DateTime.Parse(startDateTime)).ToString(@"hh\:mm");
         }
     }
 }

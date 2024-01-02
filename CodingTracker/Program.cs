@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using CodingTracker;
 using ConsoleTableExt;
 
@@ -18,8 +17,8 @@ class Program
                 @"CREATE TABLE IF NOT EXISTS coding_sessions (
                 Id INTEGER PRIMARY KEY,
                 StartDateTime TEXT,
-                EndDateTime TEXT
-                Duration REAL)";
+                EndDateTime TEXT,
+                Duration TEXT)";
 
             tableCmd.ExecuteNonQuery();
             connection.Close();
@@ -81,11 +80,12 @@ Choose one of the following options:
             Console.WriteLine("Gimme the dates");
             string startDateTime = Helpers.GetDateTimeInput("Provide the session start time and date");
             string endDateTime = Helpers.GetDateTimeInput("Provide the session end time and date");
-
+            string duration = Helpers.CalculateDuration(endDateTime, startDateTime);
+                       
             connection.Open();
             var tableCmd = connection.CreateCommand();
             tableCmd.CommandText =
-                $"INSERT INTO coding_sessions (StartDateTime, EndDateTime) VALUES ('{startDateTime}', '{endDateTime}') ";
+                $"INSERT INTO coding_sessions (StartDateTime, EndDateTime, Duration) VALUES ('{startDateTime}', '{endDateTime}', '{duration}') ";
             tableCmd.ExecuteNonQuery();
             connection.Close();
 
@@ -121,6 +121,7 @@ Choose one of the following options:
                         Id = reader.GetInt32(0),
                         StartDateTime = reader.GetString(1),
                         EndDateTime = reader.GetString(2),
+                        Duration = reader.GetString(3)
                     });
                 }
             } else Console.WriteLine("No rows found");
