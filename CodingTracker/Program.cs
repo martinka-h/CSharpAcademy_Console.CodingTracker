@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using CodingTracker;
 using ConsoleTableExt;
+using System.Security.Cryptography;
 
 class Program
 {
@@ -81,7 +82,7 @@ Choose one of the following options:
             string startDateTime = Helpers.GetDateTimeInput("Provide the session start time and date");
             string endDateTime = Helpers.GetDateTimeInput("Provide the session end time and date");
             string duration = Helpers.CalculateDuration(endDateTime, startDateTime);
-                       
+
             connection.Open();
             var tableCmd = connection.CreateCommand();
             tableCmd.CommandText =
@@ -97,7 +98,46 @@ Choose one of the following options:
     }
     private static void DeleteRecord()
     {
-        throw new NotImplementedException();
+        Console.Clear();
+        ViewAllRecords();
+
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            string recordId = Helpers.GetNumperInput("\nPlease type the Id of the record you want to delete, or type 0 to return to main menu");
+
+            if (recordId == "0")
+            {
+                MainMenu();
+            }
+            connection.Open();
+            var tableCmd = connection.CreateCommand();
+            tableCmd.CommandText = $"DELETE from coding_sessions WHERE Id = '{recordId}'";
+
+            int rowCount = tableCmd.ExecuteNonQuery();
+
+            if (rowCount == 0)
+            {
+                Console.WriteLine($"\nRecord with Id {recordId} doesn't exist.");
+                DeleteRecord();
+            }
+
+            Console.WriteLine($"\nRecord with Id {recordId} was deleted."); 
+
+            if (rowCount > 0)
+            {
+                Console.WriteLine("\nType 0 to continue to main menu or any other key to delete another record.");
+
+                if (Console.ReadLine() == "0") MainMenu();
+                else DeleteRecord();
+            } else if (rowCount < 1)
+            {
+                Console.WriteLine("Press Enter to continue to main menu");
+                Console.ReadKey();
+            }
+
+            connection.Close();
+            MainMenu();
+        }
     }
     private static void ViewAllRecords()
     {
@@ -124,7 +164,8 @@ Choose one of the following options:
                         Duration = reader.GetString(3)
                     });
                 }
-            } else Console.WriteLine("No rows found");
+            }
+            else Console.WriteLine("No rows found");
 
             connection.Close();
 

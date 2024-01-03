@@ -24,5 +24,19 @@ namespace CodingTracker
         {
             return DateTime.Parse(endDateTime).Subtract(DateTime.Parse(startDateTime)).ToString(@"hh\:mm");
         }
+
+        internal static string GetNumperInput(string message)
+        {
+            Console.WriteLine(message);
+            string numberInput = Console.ReadLine();
+
+            while (!int.TryParse(numberInput, out _))
+            {
+                Console.Write("Please provide a valid input.");
+                numberInput = Console.ReadLine();
+            }
+
+            return numberInput;
+        }
     }
 }
