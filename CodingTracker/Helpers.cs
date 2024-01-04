@@ -6,12 +6,12 @@ namespace CodingTracker
     {
         internal static string GetDateTimeInput(string message)
         {
+            Console.WriteLine(message);
             string dateInput = "";
             var cultureInfo = new CultureInfo("en-US");
 
             do
             {
-                Console.WriteLine(message);
                 Console.WriteLine("(Format: yyyy-MM-dd HH:mm)");
                 dateInput = Console.ReadLine();
 
