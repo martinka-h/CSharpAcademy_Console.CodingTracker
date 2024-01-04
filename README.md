@@ -5,10 +5,10 @@
 - [x] The application should register coding sessions
 - [x] Create a sqlite database along with a table on application start, if one isn't present.
 - [x] The application should show the user a menu of options.
-- [ ] Insert, delete, update and view the logged habit functionality.
+- [x] Insert, delete, update and view the logged habit functionality.
 - [ ] Error handling so that the application never crashes.
 - [ ] The application should only be terminated when the user inserts "0".
-- [ ] Only interact with the database using raw SQL.
+- [x] Only interact with the database using raw SQL.
 - [x] The project needs to contain a README file.
 - [x] The application should store and retrieve data from a real database
 - [x] Use the "ConsoleTableExt" library to show the data on the console.
