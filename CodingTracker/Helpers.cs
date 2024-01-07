@@ -32,7 +32,7 @@ namespace CodingTracker
 
             while (!int.TryParse(numberInput, out _))
             {
-                Console.Write("Please provide a valid input.");
+                Console.Write("Please provide a valid input.\n");
                 numberInput = Console.ReadLine();
             }
 

@@ -1,12 +1,13 @@
 ﻿using Microsoft.Data.Sqlite;
 using CodingTracker;
 using ConsoleTableExt;
-using System.Security.Cryptography;
-using System.Transactions;
+
 
 class Program
 {
     static string connectionString = @"Data Source = codingtracker.db";
+    static int codingGoal;
+    static double totalHours = 0;
 
     static void Main(string[] args)
     {
@@ -36,9 +37,13 @@ class Program
         while (!closeApp)
         {
 
-            Console.WriteLine(@"
+            Console.Clear();
+            Console.WriteLine(@$"
 
 CODING TRACKER
+____________________________
+
+{CalculateProgress()}
 ____________________________
 MAIN MENU
 
@@ -47,7 +52,8 @@ Choose one of the following options:
 1 - View all records
 2 - Insert record
 3 - Delete record
-4 - Update record");
+4 - Update record
+5 - Change or set goal");
 
             switch (Console.ReadLine())
             {
@@ -67,8 +73,11 @@ Choose one of the following options:
                 case "4":
                     UpdateRecord();
                     break;
+                case "5":
+                    SetCodingGoal();
+                    break;
                 default:
-                    Console.WriteLine("Insert a valid commant");
+                    Console.WriteLine("Insert a valid command");
                     MainMenu();
                     break;
             }
@@ -133,7 +142,7 @@ Choose one of the following options:
             {
                 newDate = Helpers.GetDateTimeInput("Please provide a new start date");
                 tableCmd.CommandText = $"UPDATE coding_sessions SET startDateTime = '{newDate}'";
-                
+
             }
             else if (Console.ReadLine() == "2")
             {
@@ -144,7 +153,7 @@ Choose one of the following options:
             tableCmd.ExecuteNonQuery();
             connection.Close();
 
-            Console.WriteLine($"The record with Id {recordId} was updated. Press any key to continue");
+            Console.WriteLine("The record with Id {recordId} was updated. Press any key to continue");
             Console.ReadLine();
             MainMenu();
         }
@@ -226,6 +235,57 @@ Choose one of the following options:
             ConsoleTableBuilder
                 .From(tableData)
                 .ExportAndWrite();
+        }
+    }
+
+    private static string CalculateProgress()
+    {
+        codingGoal = CodingGoal.LoadGoalValue();
+
+        if (codingGoal > 0 )
+        {
+            return $"Your coding goal: {codingGoal} \nYou have {String.Format("{0:0.00}", codingGoal - SumDuration())} hours left to reach your goal";
+
+        } else
+        {
+            return "You have no set coding goal. Please set a goal to track.";
+        }
+
+
+    }
+
+    public static void SetCodingGoal()
+    {
+        codingGoal = int.Parse(Helpers.GetNumperInput("Please set your coding goal, counting in whole hours"));
+
+        Console.WriteLine($"Your new coding goal: {codingGoal} hours.\n Good luck!");
+
+        CodingGoal.SaveGoalValue(codingGoal);
+
+    }
+
+    private static double SumDuration()
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var tableCmd = connection.CreateCommand();
+            tableCmd.CommandText =
+                    "SELECT SUM((CAST(strftime('%H', duration) AS INTEGER) * 3600) + (CAST(strftime('%M', duration) AS INTEGER) * 60)) as totalSeconds FROM coding_sessions";
+            var result = tableCmd.ExecuteScalar();
+
+            if (result != null && double.TryParse(result.ToString(), out totalHours))
+            {
+                totalHours = totalHours / 3600.0;
+            }
+            else
+            {
+                Console.WriteLine("Error retrieving the sum of the duration column from the database.");
+            }
+
+            connection.Close();
+
+            return totalHours;
         }
     }
 }
