@@ -20,7 +20,7 @@ namespace CodingTracker
             return dateInput;
         }
 
-        public static string CalculateDuration(string endDateTime, string startDateTime)
+        internal static string CalculateDuration(string endDateTime, string startDateTime)
         {
             return DateTime.Parse(endDateTime).Subtract(DateTime.Parse(startDateTime)).ToString(@"hh\:mm");
         }
@@ -37,6 +37,14 @@ namespace CodingTracker
             }
 
             return numberInput;
+        }
+
+        internal static int DaysLeftInMonth(DateTime date)
+        {
+            int totalDaysInMonth = DateTime.DaysInMonth(date.Year, date.Month);
+            int daysLeftInMonth = totalDaysInMonth - date.Day;
+
+            return daysLeftInMonth;
         }
     }
 }

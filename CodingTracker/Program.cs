@@ -2,7 +2,6 @@
 using CodingTracker;
 using ConsoleTableExt;
 
-
 class Program
 {
     static string connectionString = @"Data Source = codingtracker.db";
@@ -138,15 +137,17 @@ Choose one of the following options:
 
             Console.WriteLine("\nType 1 to update the start date, or type 2 to update the end date.");
 
-            if (Console.ReadLine() == "1")
+            string userInput = Console.ReadLine();
+
+            if (userInput == "1")
             {
                 newDate = Helpers.GetDateTimeInput("Please provide a new start date");
                 tableCmd.CommandText = $"UPDATE coding_sessions SET startDateTime = '{newDate}'";
 
             }
-            else if (Console.ReadLine() == "2")
+            else if (userInput == "2")
             {
-                newDate = Helpers.GetDateTimeInput("Please probide a new end date");
+                newDate = Helpers.GetDateTimeInput("Please providee a new end date");
                 tableCmd.CommandText = $"UPDATE coding_sessions SET endDateTime = '{newDate}'";
             }
 
@@ -205,6 +206,7 @@ Choose one of the following options:
     private static void ViewAllRecords()
     {
         Console.Clear();
+
         using (var connection = new SqliteConnection(connectionString))
         {
             connection.Open();
@@ -213,55 +215,58 @@ Choose one of the following options:
                 $"SELECT * FROM coding_sessions ";
 
             List<CodingSession> tableData = new();
-            SqliteDataReader reader = tableCmd.ExecuteReader();
-
-            if (reader.HasRows)
+            using (SqliteDataReader reader = tableCmd.ExecuteReader())
             {
-                while (reader.Read())
+                if (reader.HasRows)
                 {
-                    tableData.Add(new CodingSession
+                    while (reader.Read())
                     {
-                        Id = reader.GetInt32(0),
-                        StartDateTime = reader.GetString(1),
-                        EndDateTime = reader.GetString(2),
-                        Duration = reader.GetString(3)
-                    });
+                        tableData.Add(new CodingSession
+                        {
+                            Id = reader.GetInt32(0),
+                            StartDateTime = reader.GetString(1),
+                            EndDateTime = reader.GetString(2),
+                            Duration = reader.GetString(3)
+                        });
+                    }
                 }
+                else Console.WriteLine("No rows found");
             }
-            else Console.WriteLine("No rows found");
-
-            connection.Close();
-
             ConsoleTableBuilder
                 .From(tableData)
                 .ExportAndWrite();
+
+            connection.Close();
         }
+
+        Console.WriteLine("\nPress any key to continue");
+        Console.ReadKey();
     }
 
     private static string CalculateProgress()
     {
         codingGoal = CodingGoal.LoadGoalValue();
 
-        if (codingGoal > 0 )
+        if (codingGoal > 0)
         {
-            return $"Your coding goal: {codingGoal} \nYou have {String.Format("{0:0.00}", codingGoal - SumDuration())} hours left to reach your goal";
+            return @$"Your monthly coding goal: {codingGoal} 
+You have {String.Format("{0:0.00}", codingGoal - SumDuration())} hours left to reach your goal.
+To reach your goal for this month, you will have to code {codingGoal / Helpers.DaysLeftInMonth(DateTime.Now)} hours a day.";
 
-        } else
+        }
+        else
         {
             return "You have no set coding goal. Please set a goal to track.";
         }
-
-
     }
 
     public static void SetCodingGoal()
     {
-        codingGoal = int.Parse(Helpers.GetNumperInput("Please set your coding goal, counting in whole hours"));
+        codingGoal = int.Parse(Helpers.GetNumperInput("Please set your coding goal for this month, counting in whole hours"));
 
         Console.WriteLine($"Your new coding goal: {codingGoal} hours.\n Good luck!");
 
         CodingGoal.SaveGoalValue(codingGoal);
-
     }
 
     private static double SumDuration()
@@ -271,7 +276,17 @@ Choose one of the following options:
             connection.Open();
             var tableCmd = connection.CreateCommand();
             tableCmd.CommandText =
-                    "SELECT SUM((CAST(strftime('%H', duration) AS INTEGER) * 3600) + (CAST(strftime('%M', duration) AS INTEGER) * 60)) as totalSeconds FROM coding_sessions";
+                    /*"SELECT SUM((CAST(strftime('%H', duration) AS INTEGER) * 3600) + " +
+                    "(CAST(strftime('%M', duration) AS INTEGER) * 60)) " +
+                    "as totalSeconds FROM coding_sessions";*/
+                    @"SELECT
+                        SUM(
+                            (CAST(strftime('%H', duration) AS INTEGER) * 3600) +
+                            (CAST(strftime('%M', duration) AS INTEGER) * 60)
+                        ) as totalSeconds
+                    FROM coding_sessions
+                    WHERE strftime('%Y-%m', StartDateTime) = strftime('%Y-%m', CURRENT_DATE); ";
+
             var result = tableCmd.ExecuteScalar();
 
             if (result != null && double.TryParse(result.ToString(), out totalHours))
