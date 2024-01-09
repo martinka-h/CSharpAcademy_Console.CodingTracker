@@ -17,7 +17,6 @@ internal class DatabaseManager
                 Duration TEXT)";
 
             tableCmd.ExecuteNonQuery();
-            connection.Close();
         }
     }
 }

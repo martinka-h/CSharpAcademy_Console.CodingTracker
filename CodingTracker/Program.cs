@@ -86,8 +86,6 @@ Choose one of the following options:
             tableCmd.CommandText =
                 $"INSERT INTO coding_sessions (StartDateTime, EndDateTime, Duration) VALUES ('{startDateTime}', '{endDateTime}', '{duration}') ";
             tableCmd.ExecuteNonQuery();
-            connection.Close();
-
         }
     }
     private static void UpdateRecord()
@@ -141,7 +139,6 @@ Choose one of the following options:
             }
 
             tableCmd.ExecuteNonQuery();
-            connection.Close();
 
             Console.WriteLine("The record with Id {recordId} was updated. Press any key to continue");
             Console.ReadLine();
@@ -240,7 +237,7 @@ Choose one of the following options:
         {
             return @$"Your monthly coding goal: {codingGoal} 
 You have {String.Format("{0:0.00}", codingGoal - SumDuration())} hours left to reach your goal.
-To reach your goal for this month, you will have to code {codingGoal / Helpers.DaysLeftInMonth(DateTime.Now)} hours a day.";
+To reach your goal for this month, you will have to code {(codingGoal / Helpers.DaysLeftInMonth(DateTime.Now)).ToString("F1")} hours a day.";
 
         }
         else
@@ -265,9 +262,6 @@ To reach your goal for this month, you will have to code {codingGoal / Helpers.D
             connection.Open();
             var tableCmd = connection.CreateCommand();
             tableCmd.CommandText =
-                    /*"SELECT SUM((CAST(strftime('%H', duration) AS INTEGER) * 3600) + " +
-                    "(CAST(strftime('%M', duration) AS INTEGER) * 60)) " +
-                    "as totalSeconds FROM coding_sessions";*/
                     @"SELECT
                         SUM(
                             (CAST(strftime('%H', duration) AS INTEGER) * 3600) +
@@ -282,13 +276,6 @@ To reach your goal for this month, you will have to code {codingGoal / Helpers.D
             {
                 totalHours = totalHours / 3600.0;
             }
-            else
-            {
-                Console.WriteLine("Error retrieving the sum of the duration column from the database.");
-            }
-
-            connection.Close();
-
             return totalHours;
         }
     }
