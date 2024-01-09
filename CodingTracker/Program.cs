@@ -1,31 +1,20 @@
 ﻿using Microsoft.Data.Sqlite;
 using CodingTracker;
 using ConsoleTableExt;
+using System.Configuration;
 
 class Program
 {
-    static string connectionString = @"Data Source = codingtracker.db";
     static int codingGoal;
     static double totalHours = 0;
 
+    static string connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");
+
+    DatabaseManager databaseManager = new();
+ 
     static void Main(string[] args)
     {
-        using (var connection = new SqliteConnection(connectionString))
-        {
-            connection.Open();
-            var tableCmd = connection.CreateCommand();
-
-            tableCmd.CommandText =
-                @"CREATE TABLE IF NOT EXISTS coding_sessions (
-                Id INTEGER PRIMARY KEY,
-                StartDateTime TEXT,
-                EndDateTime TEXT,
-                Duration TEXT)";
-
-            tableCmd.ExecuteNonQuery();
-            connection.Close();
-        }
-
+        DatabaseManager.CreateTable(connectionString);
         MainMenu();
     }
 
@@ -87,7 +76,7 @@ Choose one of the following options:
     {
         using (var connection = new SqliteConnection(connectionString))
         {
-            Console.WriteLine("Gimme the dates");
+            Console.WriteLine("Please provide the coding session information.");
             string startDateTime = Helpers.GetDateTimeInput("Provide the session start time and date");
             string endDateTime = Helpers.GetDateTimeInput("Provide the session end time and date");
             string duration = Helpers.CalculateDuration(endDateTime, startDateTime);
